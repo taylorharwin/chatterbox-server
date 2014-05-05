@@ -1,5 +1,7 @@
 /* Import node's http module: */
 var http = require("http");
+
+/* Import request-handler.js */
 var handleRequest = require("./request-handler.js").handleRequest;
 
 
