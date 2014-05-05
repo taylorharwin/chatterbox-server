@@ -6,7 +6,33 @@
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
 var _ = require('underscore');
 
-var chatLog = [];
+var chatLog = [
+  {
+    createdAt: Date.now(),
+    objectID: 1,
+    roomname: 'lobby',
+    text: 'Hello world!',
+    username: 'yoloswag'
+  },{
+    createdAt: Date.now(),
+    objectID: 2,
+    roomname: 'lobby',
+    text: 'Go away!',
+    username: 'hateyolo'
+  },{
+    createdAt: Date.now(),
+    objectID: 3,
+    roomname: 'lobby',
+    text: 'No u! -_-',
+    username: 'yoloswag'
+  },{
+    createdAt: Date.now(),
+    objectID: 4,
+    roomname: 'lobby',
+    text: 'asl',
+    username: 'hateyolo'
+  }
+];
 
 var handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
