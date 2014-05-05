@@ -12,25 +12,35 @@ var handleRequest = function(request, response) {
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
 
+  var chatLog = [];
+
   console.log("Serving request type " + request.method + " for url " + request.url);
 
-  var statusCode = 200;
-  var responseData = { results: [] };
+  console.log(request.method);
 
-  /* Without this line, this server wouldn't work. See the note
-   * below about CORS. */
-  var headers = defaultCorsHeaders;
+  var success = function(data){
+    var statusCode = 200;
 
-  headers['Content-Type'] = "application/json";
+    /* Without this line, this server wouldn't work. See the note
+     * below about CORS. */
+    var headers = defaultCorsHeaders;
 
-  /* .writeHead() tells our server what HTTP status code to send back */
-  response.writeHead(statusCode, headers);
+    headers['Content-Type'] = "application/json";
 
-  /* Make sure to always call response.end() - Node will not send
-   * anything back to the client until you do. The string you pass to
-   * response.end() will be the body of the response - i.e. what shows
-   * up in the browser.*/
-  response.end(JSON.stringify(responseData));
+    /* .writeHead() tells our server what HTTP status code to send back */
+    response.writeHead(statusCode, headers);
+
+    /* Make sure to always call response.end() - Node will not send
+     * anything back to the client until you do. The string you pass to
+     * response.end() will be the body of the response - i.e. what shows
+     * up in the browser.*/
+    response.end(JSON.stringify(data));
+  };
+
+  if (request.method === "GET"){
+    success({'results' : chatLog});
+  }
+
 };
 
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
