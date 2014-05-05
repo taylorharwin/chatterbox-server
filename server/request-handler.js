@@ -4,6 +4,9 @@
  * You'll have to figure out a way to export this function from
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
+var _ = require('underscore');
+
+var chatLog = [];
 
 var handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
@@ -12,33 +15,47 @@ var handleRequest = function(request, response) {
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
 
-  var chatLog = [];
+
+  var responseFunc = function(statusCode, headers, data){
+      headers = headers || {};
+      data = data || '';
+
+      /* .writeHead() tells our server what HTTP status code to send back */
+      response.writeHead(statusCode, headers);
+
+      /* Without this line, this server wouldn't work. See the note
+       * below about CORS. */
+      var headers = _.extend(headers, defaultCorsHeaders);
+
+      /* Make sure to always call response.end() - Node will not send
+       * anything back to the client until you do. The string you pass to
+       * response.end() will be the body of the response - i.e. what shows
+       * up in the browser.*/
+      response.end(JSON.stringify(data));
+  };
 
   console.log("Serving request type " + request.method + " for url " + request.url);
 
-  console.log(request.method);
-
   var success = function(data){
-    var statusCode = 200;
-
-    /* Without this line, this server wouldn't work. See the note
-     * below about CORS. */
-    var headers = defaultCorsHeaders;
-
-    headers['Content-Type'] = "application/json";
-
-    /* .writeHead() tells our server what HTTP status code to send back */
-    response.writeHead(statusCode, headers);
-
-    /* Make sure to always call response.end() - Node will not send
-     * anything back to the client until you do. The string you pass to
-     * response.end() will be the body of the response - i.e. what shows
-     * up in the browser.*/
-    response.end(JSON.stringify(data));
+    responseFunc(200, {'Content-Type': 'application/json'}, data);
   };
 
-  if (request.method === "GET"){
+  var options = function(data) {
+    responseFunc(200, {'Allow': 'OPTIONS, GET, POST'}, data);
+  };
+
+  var failure = function(data) {
+    responseFunc(404);
+  };
+
+  if (request.method === "OPTIONS"){
+    success('GET, POST');
+  } else if (request.method === "GET"){
     success({'results' : chatLog});
+  } else if (request.method === "POST") {
+    success({'results': chatLog});
+  } else {
+    failure();
   }
 
 };
