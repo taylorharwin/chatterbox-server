@@ -4,20 +4,33 @@
  * You'll have to figure out a way to export this function from
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
+/* global require */
 var _ = require('underscore');
 var md5 = require('MD5');
+var url = require('url');
 
-var chatLog = [];
+var chatLog = [
+{createdAt: Date.now(),
+objectID: 5,
+text:"I'm coming from another roooomm!",
+roomname: "thetongaroom",
+username: "Rasputin"}
+];
 
-var parsePost = function(request, response){
+var parsePost = function(request){
   var JSONstring = '';
   request.on('data', function(data){
     JSONstring += data;
   });
   request.on('end', function(){
     var message = JSON.parse(JSONstring);
-    message.createdAt = new Date();
+    message.createdAt = Date.now();
     message.objectID = md5(JSON.stringify(message)).substr(0,10);
+
+    var roomName = url.parse(request.url).pathname.substr(9);
+    if (roomName !== 'messages'){
+      message.roomname = roomName;
+    }
     chatLog.push(message);
   });
 };
@@ -31,21 +44,21 @@ var handleRequest = function(request, response) {
 
 
   var responseFunc = function(statusCode, headers, data){
-      headers = headers || {};
-      data = data || '';
+    headers = headers || {};
+    data = data || '';
 
-      /* Without this line, this server wouldn't work. See the note
-       * below about CORS. */
-      var headers = _.extend(headers, defaultCorsHeaders);
+    /* Without this line, this server wouldn't work. See the note
+     * below about CORS. */
+    var headers = _.extend(headers, defaultCorsHeaders);
 
-      /* .writeHead() tells our server what HTTP status code to send back */
-      response.writeHead(statusCode, headers);
+    /* .writeHead() tells our server what HTTP status code to send back */
+    response.writeHead(statusCode, headers);
 
-      /* Make sure to always call response.end() - Node will not send
-       * anything back to the client until you do. The string you pass to
-       * response.end() will be the body of the response - i.e. what shows
-       * up in the browser.*/
-      response.end(JSON.stringify(data));
+    /* Make sure to always call response.end() - Node will not send
+     * anything back to the client until you do. The string you pass to
+     * response.end() will be the body of the response - i.e. what shows
+     * up in the browser.*/
+    response.end(JSON.stringify(data));
   };
 
   console.log("Serving request type " + request.method + " for url " + request.url);
@@ -62,12 +75,37 @@ var handleRequest = function(request, response) {
     responseFunc(404);
   };
 
+  var parseGet = function(){
+    var urlPath = url.parse(request.url).pathname;
+    console.log(urlPath.substr(0,8) === '/classes');
+    if (urlPath === '/classes/messages' || urlPath === '/log'){
+      var logCopy = chatLog.slice();
+      logCopy.sort(function(a,b){
+        return b.createdAt - a.createdAt;
+      });
+      success({'results' : logCopy});
+    }
+    else if (urlPath.substr(0,8) === '/classes'){
+      var roomName = urlPath.substr(9);
+      var roomMessages = _.filter(chatLog, function(message){
+        return message.roomname === roomName;
+      });
+      roomMessages.sort(function(a,b){
+        return b.createdAt - a.createdAt;
+      });
+      success({'results' : roomMessages});
+    }
+    else {
+      failure();
+    }
+  };
+
   if (request.method === "OPTIONS"){
     options();
   } else if (request.method === "GET"){
-    success({'results' : chatLog});
+    parseGet();
   } else if (request.method === "POST") {
-    parsePost(request, response);
+    parsePost(request);
     responseFunc(201, {}, {'results': chatLog});
   } else {
     failure();
@@ -88,3 +126,4 @@ var defaultCorsHeaders = {
 };
 
 exports.handleRequest = handleRequest;
+exports.handler = handleRequest;
