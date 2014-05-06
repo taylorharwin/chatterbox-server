@@ -5,7 +5,8 @@
   "author": "Hack Reactor",
   "license": "Copyright 2013, Hack Reactor. All rights reserved.",
   "dependencies": {
-    "underscore": "~1.6.0"
+    "underscore": "~1.6.0",
+    "MD5": "~1.2.1"
   },
   "devDependencies": {
     "request": "^2.34.0",
