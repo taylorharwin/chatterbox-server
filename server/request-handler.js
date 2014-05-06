@@ -5,34 +5,22 @@
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
 var _ = require('underscore');
+var md5 = require('MD5');
 
-var chatLog = [
-  {
-    createdAt: Date.now(),
-    objectID: 1,
-    roomname: 'lobby',
-    text: 'Hello world!',
-    username: 'yoloswag'
-  },{
-    createdAt: Date.now(),
-    objectID: 2,
-    roomname: 'lobby',
-    text: 'Go away!',
-    username: 'hateyolo'
-  },{
-    createdAt: Date.now(),
-    objectID: 3,
-    roomname: 'lobby',
-    text: 'No u! -_-',
-    username: 'yoloswag'
-  },{
-    createdAt: Date.now(),
-    objectID: 4,
-    roomname: 'lobby',
-    text: 'asl',
-    username: 'hateyolo'
-  }
-];
+var chatLog = [];
+
+var parsePost = function(request, response){
+  var JSONstring = '';
+  request.on('data', function(data){
+    JSONstring += data;
+  });
+  request.on('end', function(){
+    var message = JSON.parse(JSONstring);
+    message.createdAt = new Date();
+    message.objectID = md5(JSON.stringify(message)).substr(0,10);
+    chatLog.push(message);
+  });
+};
 
 var handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
@@ -46,12 +34,12 @@ var handleRequest = function(request, response) {
       headers = headers || {};
       data = data || '';
 
-      /* .writeHead() tells our server what HTTP status code to send back */
-      response.writeHead(statusCode, headers);
-
       /* Without this line, this server wouldn't work. See the note
        * below about CORS. */
       var headers = _.extend(headers, defaultCorsHeaders);
+
+      /* .writeHead() tells our server what HTTP status code to send back */
+      response.writeHead(statusCode, headers);
 
       /* Make sure to always call response.end() - Node will not send
        * anything back to the client until you do. The string you pass to
@@ -70,16 +58,17 @@ var handleRequest = function(request, response) {
     responseFunc(200, {'Allow': 'OPTIONS, GET, POST'}, data);
   };
 
-  var failure = function(data) {
+  var failure = function() {
     responseFunc(404);
   };
 
   if (request.method === "OPTIONS"){
-    success('GET, POST');
+    options();
   } else if (request.method === "GET"){
     success({'results' : chatLog});
   } else if (request.method === "POST") {
-    success({'results': chatLog});
+    parsePost(request, response);
+    responseFunc(201, {}, {'results': chatLog});
   } else {
     failure();
   }
