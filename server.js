@@ -21,7 +21,8 @@ var roomNames = ["Lobby"];
 // Set up server
 var app = express();
 app.use(bodyParser());  // to parse message POST requests properly
-app.listen(3000, 'localhost');
+var port = process.env.PORT || 3000;
+app.listen(port, 'localhost');
 
 
 // Allow cross-origin resource sharing (CROSS)
