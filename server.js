@@ -4,7 +4,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var md5 = require('MD5');
-var path = require('path');
 
 
 var chatLog = [
@@ -84,9 +83,3 @@ app.post('/classes/rooms', function(request, response) {
   }
   response.send('Hooray! :)');
 });
-
-app.configure(function(){
-  app.use(express.static(path.join(__dirname, './client')));
-});
-
-
