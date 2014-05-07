@@ -4,6 +4,7 @@
   "main": "server/main.js",
   "author": "Hack Reactor",
   "license": "Copyright 2013, Hack Reactor. All rights reserved.",
+  "repository": "https://github.com/taylorharwin/chatterbox-server.git",
   "dependencies": {
     "underscore": "~1.6.0",
     "MD5": "~1.2.1",
