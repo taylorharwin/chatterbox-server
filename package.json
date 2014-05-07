@@ -10,7 +10,8 @@
     "MD5": "~1.2.1",
     "express": "~4.1.1",
     "express-json": "~0.1.0",
-    "body-parser": "~1.0.2"
+    "body-parser": "~1.0.2",
+    "path": "~0.4.9"
   },
   "devDependencies": {
     "request": "^2.34.0",
