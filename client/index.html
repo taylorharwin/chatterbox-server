@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- dependencies -->
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/jquery-timeago/jquery.timeago.js"></script>
+
+    <!-- your scripts -->
+    <script src="scripts/app.js"></script>
+  </head>
+  <body>
+  <h1>THIS IS NOT SUPPOSED TO WORK</h1>
+  <script>
+    if (!/(&|\?)username=/.test(window.location.search)) {
+      var newSearch = window.location.search;
+      if (newSearch !== '' & newSearch !== '?') {
+        newSearch += '&';
+      }
+      newSearch += 'username=' + (prompt('What is your name?') || 'anonymous');
+      window.location.search = newSearch;
+    }
+  </script>
+  <div id="wrapper">
+    <form id="send">
+      <input class="message" type="text">
+      <button class="submit">Send</button>
+    </form>
+    <form id="createRoom">
+      <input class="room" type="text">
+      <button class="createRoom">Make Room</button>
+    </form>
+    <div id="main">
+      <ul id="roomSelect"></ul>
+      <h1>chatterbox</h1>
+      <div id="chats"></div>
+    </div>
+    <div id="sideBar">
+      <h1></h1>
+      <h2>Friend's List</h2>
+      <ul id="friendList">
+      </ul>
+    </div>
+  </div>
+  </body>
+</html>

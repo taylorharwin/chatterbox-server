@@ -10,7 +10,7 @@ var md5 = require('MD5');
 var url = require('url');
 
 var chatLog = [
-{createdAt: Date.now(),
+{createdAt: new Date(),
 objectID: 5,
 text:"I'm coming from another roooomm!",
 roomname: "thetongaroom",
@@ -24,7 +24,7 @@ var parsePost = function(request){
   });
   request.on('end', function(){
     var message = JSON.parse(JSONstring);
-    message.createdAt = Date.now();
+    message.createdAt = new Date();
     message.objectID = md5(JSON.stringify(message)).substr(0,10);
 
     var roomName = url.parse(request.url).pathname.substr(9);
@@ -84,6 +84,16 @@ var handleRequest = function(request, response) {
         return b.createdAt - a.createdAt;
       });
       success({'results' : logCopy});
+    }
+    else if (urlPath === '/classes/rooms'){
+      var allNames = {};
+      var getRoomNames = function(){
+        _.each(chatLog, function(message){
+          allNames[message.roomname] = true;
+        });
+      };
+      getRoomNames();
+      success({'results' : Object.keys(allNames)});
     }
     else if (urlPath.substr(0,8) === '/classes'){
       var roomName = urlPath.substr(9);
